@@ -1,92 +1,60 @@
-Highcharts.chart('container', {
+ // The GitHub raw URL of your JSON file
+ const jsonUrl = "https://raw.githubusercontent.com/soniamoretti/Project-3-Top-Sporify-Songs/refs/heads/main/Resources/Spotify_songs.json";
 
-    chart: {
-        polar: true,
-        type: 'line'
-    },
+ // Load the Spotify JSON data
+ d3.json(jsonUrl).then((data) => {
+     // Populate dropdown with track names
+     let dropdown = d3.select("#selDataset");
+     data.forEach((song, index) => {
+         dropdown.append("option").text(song.track_name).property("value", index);
+     });
 
-    accessibility: {
-        description: 'A spiderweb chart compares the allocated budget ' +
-            'against actual spending within an organization. The spider ' +
-            'chart has six spokes. Each spoke represents one of the 6 ' +
-            'departments within the organization: sales, marketing, ' +
-            'development, customer support, information technology and ' +
-            'administration. The chart is interactive, and each data point ' +
-            'is displayed upon hovering. The chart clearly shows that 4 of ' +
-            'the 6 departments have overspent their budget with Marketing ' +
-            'responsible for the greatest overspend of $20,000. The ' +
-            'allocated budget and actual spending data points for each ' +
-            'department are as follows: Sales. Budget equals $43,000; ' +
-            'spending equals $50,000. Marketing. Budget equals $19,000; ' +
-            'spending equals $39,000. Development. Budget equals $60,000; ' +
-            'spending equals $42,000. Customer support. Budget equals $35,' +
-            '000; spending equals $31,000. Information technology. Budget ' +
-            'equals $17,000; spending equals $26,000. Administration. Budget ' +
-            'equals $10,000; spending equals $14,000.'
-    },
+     // Build the initial charts with the first song
+     let firstSong = data[0];
+     buildChart(firstSong);
 
-    title: {
-        text: 'Budget vs spending',
-        x: -80
-    },
+     // Update chart when a new song is selected
+     dropdown.on("change", function() {
+         let selectedIndex = dropdown.property("value");
+         let selectedSong = data[selectedIndex];
+         buildChart(selectedSong);
+     });
+ });
 
-    pane: {
-        size: '80%'
-    },
-
-    xAxis: {
-        categories: [
-            'Sales', 'Marketing', 'Development', 'Customer Support',
-            'Information Technology', 'Administration'
-        ],
-        tickmarkPlacement: 'on',
-        lineWidth: 0
-    },
-
-    yAxis: {
-        gridLineInterpolation: 'polygon',
-        lineWidth: 0,
-        min: 0
-    },
-
-    tooltip: {
-        shared: true,
-        pointFormat: '<span style="color:{series.color}">{series.name}: <b>' +
-            '${point.y:,.0f}</b><br/>'
-    },
-
-    legend: {
-        align: 'right',
-        verticalAlign: 'middle',
-        layout: 'vertical'
-    },
-
-    series: [{
-        name: 'Allocated Budget',
-        data: [43000, 19000, 60000, 35000, 17000, 10000],
-        pointPlacement: 'on'
-    }, {
-        name: 'Actual Spending',
-        data: [50000, 39000, 42000, 31000, 26000, 14000],
-        pointPlacement: 'on'
-    }],
-
-    responsive: {
-        rules: [{
-            condition: {
-                maxWidth: 500
-            },
-            chartOptions: {
-                legend: {
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal'
-                },
-                pane: {
-                    size: '70%'
-                }
-            }
-        }]
-    }
-
-});
+ // Function to build the spiderweb (radar) chart
+ function buildChart(song) {
+     Highcharts.chart('container', {
+         chart: {
+             polar: true,
+             type: 'line'
+         },
+         title: {
+             text: `${song.track_name} by ${song["artist(s)_name"]}`
+         },
+         pane: {
+             size: '80%'
+         },
+         xAxis: {
+             categories: ['Danceability', 'Valence', 'Energy', 'Acousticness', 'Instrumentalness', 'Liveness'],
+             tickmarkPlacement: 'on',
+             lineWidth: 0
+         },
+         yAxis: {
+             gridLineInterpolation: 'polygon',
+             lineWidth: 0,
+             min: 0
+         },
+         series: [{
+             name: song.track_name,
+             data: [
+                 song["danceability_%"], 
+                 song["valence_%"], 
+                 song["energy_%"], 
+                 song["acousticness_%"], 
+                 song["instrumentalness_%"], 
+                 song["liveness_%"]
+             ],
+             pointPlacement: 'on'
+         }]
+     });
+ }
