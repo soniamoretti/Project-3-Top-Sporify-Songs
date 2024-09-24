@@ -30,7 +30,73 @@ function processWordcloudData(songs) {
     return filteredData;
 }
 
-// Load and process the data to create both the Wordcloud and radar chart
+// NEW FUNCTION: Process the top 20 songs based on streams for the bar chart
+function processBarChartData(songs) {
+    // Sort the songs by streams in descending order and take the top 20
+    const topSongs = songs.sort((a, b) => b.streams - a.streams).slice(0, 20);
+    
+    // Prepare data for the bar chart
+    const categories = topSongs.map(song => song.track_name); // Song names
+    const streams = topSongs.map(song => song.streams); // Stream counts
+    const artists = topSongs.map(song => song["artist(s)_name"]); // Artist names
+
+    return { categories, streams, artists };
+}
+
+// UPDATED FUNCTION: Create the bar chart with artist names in the tooltip
+function buildBarChart(categories, streams, artists) {
+    Highcharts.chart('container-bar', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Top 20 Songs by Streams'
+        },
+        xAxis: {
+            categories: categories,
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Streams',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        series: [{
+            name: 'Streams',
+            data: streams
+        }],
+        tooltip: {
+            // CUSTOMIZE TOOLTIP TO SHOW BOTH SONG AND ARTIST NAMES
+            formatter: function() {
+                const songIndex = this.point.index; // Get the index of the hovered point
+                const songName = categories[songIndex]; // Get the song name
+                const artistName = artists[songIndex]; // Get the artist name
+
+                // Display the song name, artist name, and stream count in the tooltip
+                return `<b>${songName}</b><br>Artist: ${artistName}<br>Streams: ${this.y}`;
+            }
+        },
+        credits: {
+            enabled: false
+        }
+    });
+}
+
+// Load and process the data to create both the Wordcloud, bar chart and radar chart
 document.addEventListener('DOMContentLoaded', async function () {
     const songs = await loadJsonData(); // Load data from JSON file
 
@@ -79,6 +145,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         let selectedSong = songs[selectedIndex];
         buildChart(selectedSong);
     });
+
+    // NEW CODE: Process the data for the bar chart
+    const barChartData = processBarChartData(songs);
+    
+    // NEW CODE: Build the bar chart
+    buildBarChart(barChartData.categories, barChartData.streams, barChartData.artists);
 });
 
 // Function to build the radar (spiderweb) chart
