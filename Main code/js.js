@@ -1,132 +1,192 @@
-Highcharts.chart('container', {
+// The GitHub raw URL of your JSON file
+const jsonUrl = "https://raw.githubusercontent.com/soniamoretti/Project-3-Top-Sporify-Songs/refs/heads/main/Resources/Spotify_songs.json";
 
-    chart: {
-        polar: true,
-        type: 'line'
-    },
+// Load the JSON file from the URL using fetch
+async function loadJsonData() {
+    const response = await fetch(jsonUrl); 
+    const data = await response.json();
+    return data;
+}
 
-    accessibility: {
-        description: 'A spiderweb chart compares the allocated budget ' +
-            'against actual spending within an organization. The spider ' +
-            'chart has six spokes. Each spoke represents one of the 6 ' +
-            'departments within the organization: sales, marketing, ' +
-            'development, customer support, information technology and ' +
-            'administration. The chart is interactive, and each data point ' +
-            'is displayed upon hovering. The chart clearly shows that 4 of ' +
-            'the 6 departments have overspent their budget with Marketing ' +
-            'responsible for the greatest overspend of $20,000. The ' +
-            'allocated budget and actual spending data points for each ' +
-            'department are as follows: Sales. Budget equals $43,000; ' +
-            'spending equals $50,000. Marketing. Budget equals $19,000; ' +
-            'spending equals $39,000. Development. Budget equals $60,000; ' +
-            'spending equals $42,000. Customer support. Budget equals $35,' +
-            '000; spending equals $31,000. Information technology. Budget ' +
-            'equals $17,000; spending equals $26,000. Administration. Budget ' +
-            'equals $10,000; spending equals $14,000.'
-    },
+// Process artist names for the Wordcloud
+function processWordcloudData(songs) {
+    const artists = songs.flatMap(song => song["artist(s)_name"].split(", "));
+    
+    // Count artist repetitions
+    const data = artists.reduce((arr, artist) => {
+        let obj = Highcharts.find(arr, obj => obj.name === artist);
+        if (obj) {
+            obj.weight += 1;
+        } else {
+            obj = { name: artist, weight: 1 };
+            arr.push(obj);
+        }
+        return arr;
+    }, []);
 
-    title: {
-        text: 'Budget vs spending',
-        x: -80
-    },
+    // Filter out artists with less than 8 repetitions
+    const filteredData = data.filter(artist => artist.weight > 8);
 
-<<<<<<< Updated upstream
-    pane: {
-        size: '80%'
-    },
+    return filteredData;
+}
 
-    xAxis: {
-        categories: [
-            'Sales', 'Marketing', 'Development', 'Customer Support',
-            'Information Technology', 'Administration'
-        ],
-        tickmarkPlacement: 'on',
-        lineWidth: 0
-    },
+// NEW FUNCTION: Process the top 20 songs based on streams for the bar chart
+function processBarChartData(songs) {
+    // Sort the songs by streams in descending order and take the top 20
+    const topSongs = songs.sort((a, b) => b.streams - a.streams).slice(0, 20);
+    
+    // Prepare data for the bar chart
+    const categories = topSongs.map(song => song.track_name); // Song names
+    const streams = topSongs.map(song => song.streams); // Stream counts
+    const artists = topSongs.map(song => song["artist(s)_name"]); // Artist names
 
-    yAxis: {
-        gridLineInterpolation: 'polygon',
-        lineWidth: 0,
-        min: 0
-    },
+    return { categories, streams, artists };
+}
 
-    tooltip: {
-        shared: true,
-        pointFormat: '<span style="color:{series.color}">{series.name}: <b>' +
-            '${point.y:,.0f}</b><br/>'
-    },
-
-    legend: {
-        align: 'right',
-        verticalAlign: 'middle',
-        layout: 'vertical'
-    },
-
-    series: [{
-        name: 'Allocated Budget',
-        data: [43000, 19000, 60000, 35000, 17000, 10000],
-        pointPlacement: 'on'
-    }, {
-        name: 'Actual Spending',
-        data: [50000, 39000, 42000, 31000, 26000, 14000],
-        pointPlacement: 'on'
-    }],
-
-    responsive: {
-        rules: [{
-            condition: {
-                maxWidth: 500
+// UPDATED FUNCTION: Create the bar chart with artist names in the tooltip
+function buildBarChart(categories, streams, artists) {
+    Highcharts.chart('container-bar', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Top 20 Songs by Streams'
+        },
+        xAxis: {
+            categories: categories,
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Streams',
+                align: 'high'
             },
-            chartOptions: {
-                legend: {
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal'
-                },
-                pane: {
-                    size: '70%'
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
                 }
             }
-        }]
-    }
+        },
+        series: [{
+            name: 'Streams',
+            data: streams
+        }],
+        tooltip: {
+            // CUSTOMIZE TOOLTIP TO SHOW BOTH SONG AND ARTIST NAMES
+            formatter: function() {
+                const songIndex = this.point.index; // Get the index of the hovered point
+                const songName = categories[songIndex]; // Get the song name
+                const artistName = artists[songIndex]; // Get the artist name
 
+                // Display the song name, artist name, and stream count in the tooltip
+                return `<b>${songName}</b><br>Artist: ${artistName}<br>Streams: ${this.y}`;
+            }
+        },
+        credits: {
+            enabled: false
+        }
+    });
+}
+
+// Load and process the data to create both the Wordcloud, bar chart and radar chart
+document.addEventListener('DOMContentLoaded', async function () {
+    const songs = await loadJsonData(); // Load data from JSON file
+
+    // Create the Wordcloud chart
+    const wordcloudData = processWordcloudData(songs); 
+    Highcharts.chart('container-wc', {
+        accessibility: {
+            screenReaderSection: {
+                beforeChartFormat: '<h5>{chartTitle}</h5>' +
+                    '<div>{chartSubtitle}</div>' +
+                    '<div>{chartLongdesc}</div>' +
+                    '<div>{viewTableButton}</div>'
+            }
+        },
+        series: [{
+            type: 'wordcloud',
+            data: wordcloudData, // Artist names
+            name: 'Occurrences'
+        }],
+        title: {
+            text: 'Most popular artist in 2023',
+            align: 'left'
+        },
+        subtitle: {
+            text: 'Project 3',
+            align: 'left'
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size: 16px"><b>{point.key}</b></span><br>'
+        }
+    });
+
+    // Populate the dropdown with track names
+    let dropdown = d3.select("#selDataset");
+    songs.forEach((song, index) => {
+        dropdown.append("option").text(song.track_name).property("value", index);
+    });
+
+    // Build the initial radar chart with the first song
+    let firstSong = songs[0];
+    buildChart(firstSong);
+
+    // Update radar chart when a new song is selected
+    dropdown.on("change", function() {
+        let selectedIndex = dropdown.property("value");
+        let selectedSong = songs[selectedIndex];
+        buildChart(selectedSong);
+    });
+
+    // NEW CODE: Process the data for the bar chart
+    const barChartData = processBarChartData(songs);
+    
+    // NEW CODE: Build the bar chart
+    buildBarChart(barChartData.categories, barChartData.streams, barChartData.artists);
 });
-=======
- // Function to build the spiderweb (radar) chart
- function buildChart(song) {
-     Highcharts.chart('container', {
-         chart: {
-             polar: true,
-             type: 'line'
-         },
-         title: {
-             text: `${song.track_name} by ${song["artist(s)_name"]}`
-         },
-         pane: {
-             size: '80%'
-         },
-         xAxis: {
-             categories: ['Danceability' , 'Valence 😄', 'Energy', 'Acousticness', 'Instrumentalness', 'Liveness'],
-             tickmarkPlacement: 'on',
-             lineWidth: 0
-         },
-         yAxis: {
-             gridLineInterpolation: 'polygon',
-             lineWidth: 0,
-             min: 0
-         },
-         series: [{
-             name: song.track_name,
-             data: [
-                 song["danceability_%"], 
-                 song["valence_%"], 
-                 song["energy_%"], 
-                 song["acousticness_%"], 
-                 song["instrumentalness_%"], 
-                 song["liveness_%"]
-             ],
-             pointPlacement: 'on'
-         }]
-     });
- }
->>>>>>> Stashed changes
+
+// Function to build the radar (spiderweb) chart
+function buildChart(song) {
+    Highcharts.chart('container', {
+        chart: {
+            polar: true,
+            type: 'line'
+        },
+        title: {
+            text: `${song.track_name} by ${song["artist(s)_name"]}`
+        },
+        pane: {
+            size: '80%'
+        },
+        xAxis: {
+            categories: ['Danceability', 'Valence', 'Energy', 'Acousticness', 'Instrumentalness', 'Liveness'],
+            tickmarkPlacement: 'on',
+            lineWidth: 0
+        },
+        yAxis: {
+            gridLineInterpolation: 'polygon',
+            lineWidth: 0,
+            min: 0
+        },
+        series: [{
+            name: song.track_name,
+            data: [
+                song["danceability_%"], 
+                song["valence_%"], 
+                song["energy_%"], 
+                song["acousticness_%"], 
+                song["instrumentalness_%"], 
+                song["liveness_%"]
+            ],
+            pointPlacement: 'on'
+        }]
+    });
+}
