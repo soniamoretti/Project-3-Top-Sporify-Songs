@@ -30,6 +30,7 @@ Highcharts.chart('container', {
         x: -80
     },
 
+<<<<<<< Updated upstream
     pane: {
         size: '80%'
     },
@@ -90,3 +91,42 @@ Highcharts.chart('container', {
     }
 
 });
+=======
+ // Function to build the spiderweb (radar) chart
+ function buildChart(song) {
+     Highcharts.chart('container', {
+         chart: {
+             polar: true,
+             type: 'line'
+         },
+         title: {
+             text: `${song.track_name} by ${song["artist(s)_name"]}`
+         },
+         pane: {
+             size: '80%'
+         },
+         xAxis: {
+             categories: ['Danceability' , 'Valence 😄', 'Energy', 'Acousticness', 'Instrumentalness', 'Liveness'],
+             tickmarkPlacement: 'on',
+             lineWidth: 0
+         },
+         yAxis: {
+             gridLineInterpolation: 'polygon',
+             lineWidth: 0,
+             min: 0
+         },
+         series: [{
+             name: song.track_name,
+             data: [
+                 song["danceability_%"], 
+                 song["valence_%"], 
+                 song["energy_%"], 
+                 song["acousticness_%"], 
+                 song["instrumentalness_%"], 
+                 song["liveness_%"]
+             ],
+             pointPlacement: 'on'
+         }]
+     });
+ }
+>>>>>>> Stashed changes
