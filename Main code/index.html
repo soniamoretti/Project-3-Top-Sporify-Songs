@@ -3,43 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Song Analysis</title>
-    
-    <!-- Highcharts & scrips -->
+<<<<<<< Updated upstream
+    <title>Spiderweb Chart</title>
+    <link rel="stylesheet" href="css.css">
     <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/wordcloud.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+=======
+    <title>Spotify Song Analysis</title>
+    <link rel="stylesheet" href="css.css">
 
-    <!-- Importing main js logic file -->
-    <script src="js.js" defer></script>
+<!-- Highcharts & scrips -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/wordcloud.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<!-- Importing main js logic file -->
+<script src="js.js" defer></script>
+
+>>>>>>> Stashed changes
 </head>
+
 <body>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
 
-     <!-- Dropdown for song selection -->
-    <label for="selDataset">Choose a song:</label>
-    <select id="selDataset"></select>
+<div class="section" style="background-color: #12D861">
+    <div class="main-container">
+    <div class="content_header">
+        <div style="width: 50%;"  >
+        <h1 style="max-width: 550px;">Analyzing the most streamed Spotify songs of 2023</h1>
+        </div>
+        <div style="width: 50%; height: min-content;">
+            <img style="max-height: 80%;" src="../Resources/topimg.png" alt="Description of image">
+        </div>
+    </div>
+    </div>
+</div>
 
-    <!-- Div to display song metadata -->
-    <div id="song-metadata"></div>
+
+<div class="section">
+    <div class="main-container">
+        <div class="content">
+        
+            <h1>"2023's Hit Tracks Unveiled: A Spider Chart of Sound"</h1>
+       
+             <!-- Dropdown for song selection -->
+                <label for="selDataset">Choose a song:</label>
+                <select id="selDataset"></select>
+
+            <!-- Div to display song metadata -->
+             <div id="song-metadata"></div>
 
     <!-- Container for the spiderweb chart -->
     <div id="container" style="width: 600px; height: 400px; margin: 0 auto"></div>
 
     <!-- Container for the Wordcloud chart -->
+>>>>>>> Stashed changes
     <figure class="highcharts-figure">
-        <div id="container-wc"></div>
+        <div id="container"></div>
         <p class="highcharts-description">
-            Wordcloud showing the most common artists in Spotify songs.
+            A spiderweb chart or radar chart is a variant of the polar chart.
+            Spiderweb charts are commonly used to compare multivariate data sets,
+            like this demo using six variables of comparison.
         </p>
     </figure>
+=======
 
-    <!-- NEW SECTION: Container for the Bar Chart (Top 20 Songs by Streams) -->
-    <div id="container-bar" style="width: 600px; height: 400px; margin: 0 auto;"></div>
-    <!-- End of new section -->
+<div class="section" style="background-color: #12D861">
+    <div class="main-container">
+    <div class="content_header">
+        <div style="width: 50%;"  >
+        <h1 style="max-width: 550px;">Analyzing the most streamed Spotify songs of 2023</h1>
+        </div>
+        <div style="width: 50%; height: min-content;">
+            <img style="max-height: 80%;" src="../Resources/Log in Page 1.png" alt="Description of image">
+        </div>
+    </div>
+    </div>
+</div>
 
+
+<div class="section">
+    <div class="main-container">
+        <div class="content">
+        
+            <h1>"2023's Hit Tracks Unveiled: A Spider Chart of Sound"</h1>
+       
+             <!-- Dropdown for song selection -->
+                <label for="selDataset">Choose a song:</label>
+                <select id="selDataset"></select>
+
+            <!-- Div to display song metadata -->
+             <div id="song-metadata"></div>
+
+            <!-- Container for the spiderweb chart -->
+            <div id="container" style="width: 600px; height: 400px; margin: 0 auto"></div>
+    
+        </div>
+    </div>
+
+</div>
+
+    
+>>>>>>> Stashed changes
+
+    <script src="js.js"></script>
 </body>
 </html>
